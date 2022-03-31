@@ -356,3 +356,71 @@ function build_network_graph(case::Dict{String,<:Any};
 
     return graph
 end
+
+
+
+"""
+    `itdgraph = combine_itd_network_graphs(tgraph, dgraph, case::Dict{String,<:Any})``
+
+    Combines two `InfrastructureGraph` graphs and creates a single `InfrastructureGraph` with all metadata from a power itd network `case`.
+
+    Arguments:
+
+    `tgraph::InfrastructureGraph{<:LightGraphs.AbstractGraph}`: Transmission system Network graph
+    `dgraph::InfrastructureGraph{<:LightGraphs.AbstractGraph}`: Distribution system(s) Network graph
+    `case::Dict{String,<:Any}`: Network case
+
+    Returns:
+
+    `infr_itdgraph`: InfrastructureGraph that represents the ITD power graph.
+"""
+
+function combine_itd_network_graphs(tgraph::InfrastructureGraph{T}, dgraph::InfrastructureGraph{T}, case::Dict{String,<:Any}) where T <: LightGraphs.AbstractGraph
+
+    # Combine
+    light_itdgraph = LightGraphs.blockdiag(tgraph.graph, dgraph.graph) # create LightGraph
+    infr_itdgraph = InfrastructureGraph(light_itdgraph) # create InfrastructureGraph based on LightGraph
+
+    # Merge/Combine Metadatas
+    BIAS_DISTR = LightGraphs.nv(tgraph.graph) # bias number that represents the total number of transmission system nodes.
+    infr_itdgraph.metadata = tgraph.metadata # copy entire tgraph
+
+    # Loop dgraph metadata and add to overall graph metadata
+    for meta in dgraph.metadata
+        # change node number in metadata
+        if (typeof(meta[1]) == Int)
+            if (meta[2][:label] != "~")
+                meta[2][:label] = string(parse(Int, meta[2][:label]) + BIAS_DISTR) # Add bias to label
+            end
+            infr_itdgraph.metadata[meta[1] + BIAS_DISTR] = meta[2] # add metadata
+        end
+
+        # # TODO: Rename edges metadata with biased nodes numbers (change src and dst for edge in metadata)
+        # if (typeof(meta[1]) == LightGraphs.SimpleGraphs.SimpleEdge{Int})
+        #     @info "$(LightGraphs.src(meta[1]))"
+        #     @info "$(LightGraphs.dst(meta[1]))"
+        # end
+    end
+
+
+    # Add connection edges (using PMITD data).
+    for boundary in case["it"]["pmitd"]
+        d_boundary = 0 # temp var dist. boundary
+        t_boundary = 0 # temp var trans. boundary
+        for node_meta in infr_itdgraph.metadata
+            if (typeof(node_meta[1]) == Int)
+                if (node_meta[2][:label] != "~")
+                    if (parse(Int, node_meta[2][:label]) == boundary[2]["transmission_boundary"])
+                        t_boundary = node_meta[1]
+                    elseif (parse(Int, node_meta[2][:label]) == boundary[2]["distribution_boundary"]+BIAS_DISTR)
+                        d_boundary = node_meta[1]
+                    end
+                end
+            end
+        end
+        add_edge!(infr_itdgraph, d_boundary, t_boundary)
+    end
+
+    return infr_itdgraph
+
+end

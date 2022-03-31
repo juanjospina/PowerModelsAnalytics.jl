@@ -24,3 +24,16 @@ function InfrastructureGraph(nvertices::Int)
 
     return InfrastructureGraph{LightGraphs.SimpleDiGraph}(graph, metadata)
 end
+
+
+"""
+    InfrastructureGraph(LightGraph.graph)
+
+Constructor for the InfrastructureGraph struct, given a LightGraph `graph`
+"""
+function InfrastructureGraph(lgraph::LightGraphs.AbstractGraph)
+
+    metadata = Dict{Union{Int,LightGraphs.AbstractEdge},Dict{Symbol,<:Any}}()
+
+    return InfrastructureGraph{LightGraphs.SimpleDiGraph}(lgraph, metadata)
+end

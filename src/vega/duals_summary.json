@@ -1,0 +1,52 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "Scatter plot depicting duals.",
+  "width": 500,
+  "height": 300,
+  "padding": 5,
+
+  "data": [],
+
+  "scales": [
+  {
+      "name": "xscale",
+      "type": "point",
+      "domain": {"data": "source", "field": "busname"},
+      "range": "width",
+      "padding": 1.05,
+      "round": true
+  },
+  {
+      "name": "yscale",
+      "type": "linear",
+      "domain": {"data": "source", "field": "duals"},
+      "range": "height",
+      "padding": 0.05,
+      "round": true
+  }
+  ],
+
+  "axes": [
+      { "orient": "bottom", "scale": "xscale", "title":"Buses", "grid":true},
+      { "orient": "left", "scale": "yscale" , "title":"Duals (LMPs)", "grid":true}
+  ],
+
+  "marks": [
+      {
+        "name": "marks",
+        "type": "symbol",
+        "from": {"data": "source"},
+        "encode": {
+          "update": {
+            "x": {"scale": "xscale", "field": "busname"},
+            "y": {"scale": "yscale", "field": "duals"},
+            "shape": {"value": "circle"},
+            "strokeWidth": {"value": 1},
+            "opacity": {"value": 1.5},
+            "stroke": {"value": "#AB274F"},
+            "fill": {"value": "steelblue"}
+          }
+        }
+      }
+    ]
+}

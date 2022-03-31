@@ -5,6 +5,31 @@
 - Update minimum Julia version to v1.6 (LTS)
 - Fix bug in `identify_blocks` for non-default bus status values
 
+## v0.5.0
+
+- Bumped compatibility of all dependencies in the package to their latest versions.
+- Added new constructor to `types.jl` that constructs an `InfrastructureGraph` from a `LightGraphs` passed as input.
+- Refactored `plot_network(case::Dict{String,<:Any};...)` in `networks.jl` so that it can distinguish between multiinfrastructure (pmitd) graphs.
+- Added new function called `combine_itd_network_graphs(...)` to `common.jl` that combines T&D graphs into one. (Currently, this function only supports PMDs passed in using the MATH data format.)
+- Added new `vega` specs to `default_specs.jl` that store the options to plot the newly added functions.
+- Added new function to `analytics.jl` called `plot_distribution_total_source_demand_summary` that plots the total generation and load demand from the `pmd` structure (i.e., all distribution systems).
+- Added new function to `analytics.jl` called `plot_transmission_total_source_demand_summary` that plots the total generation from the `pm` structure.
+- Added new function to `analytics.jl` called `plot_distribution_source_demand_summary` that plots the individual elements' generation and load demand from the `pmd` structure.
+- Added new function to `analytics.jl` called `plot_transmission_source_demand_summary` that plots the individual elements' generation from the `pm` structure.
+- Added new function to `analytics.jl` called `plot_distribution_source_perphase_summary` that plots the per-phase generation powers of individual elements in the `pmd` structure.
+- Added new function to `analytics.jl` called `plot_boundary_summary` that plots the three-phase powers flowing at the boundaries.
+- Added new function to `analytics.jl` called `plot_transmission_voltage_magnitudes` that plots the voltage magnitudes of the transmission system buses.
+- Added new function to `analytics.jl` called `plot_distribution_voltage_magnitudes` that plots the voltage magnitudes of the distribution system buses (per-phase).
+- Added new `vega` spec, `voltage_magnitude.json` schema , to `default_specs.jl` that store the options to plot the newly added functions related to voltage magnitude plots.
+- Added new function to `analytics.jl` called `plot_transmission_duals` that plots the duals of the transmission system buses.
+- Added new function to `analytics.jl` called `plot_distribution_duals` that plots the duals of the distribution system buses.
+- Added new `vega` spec, `duals_summary.json` schema , to `default_specs.jl` that store the options to plot the newly added functions related to duals plots.
+- Modified time-series plots schemas such that step interpolation is used instead of linear interpolation.
+- Refactored `plot_boundary_summary` function to allow plotting mutisystem multinetwork problems.
+- Added support for regular `PowerModels.jl` and `PowerModelsDistribution.jl` solutions so that these can be plotted using the created functions.
+- Renamed/Refactored function names `plot_pm_...` -> `plot_transmission_...` and `plot_pmd_...` -> `plot_distribution_...`.
+- Added docstrings to new functions.
+
 ## v0.4.1
 
 - Adds plot_network! functions that will return figure instead of graph; useful for generating plots in Pluto notebooks

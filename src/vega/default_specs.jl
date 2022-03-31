@@ -10,5 +10,14 @@ const default_edge_label_spec = Vega.loadvgspec(joinpath(dirname(pathof(PowerMod
 "Vega spec for branch impedance plot"
 const default_branch_impedance_spec = Vega.loadvgspec(joinpath(dirname(pathof(PowerModelsAnalytics)), "vega", "branch_impedance.json"))
 
-"Vega spec for Source Demand Summary Plot"
+"Vega spec for Total Source Demand Summary Plot"
+const default_total_source_demand_summary_spec = Vega.loadvgspec(joinpath(dirname(pathof(PowerModelsAnalytics)), "vega", "total_source_demand_summary.json"))
+
+"Vega spec for Individual Source-Demand Summary Plot"
 const default_source_demand_summary_spec = Vega.loadvgspec(joinpath(dirname(pathof(PowerModelsAnalytics)), "vega", "source_demand_summary.json"))
+
+"Vega spec for Voltage Magnitudes Scatter Plots"
+const default_voltage_magnitude_spec = Vega.loadvgspec(joinpath(dirname(pathof(PowerModelsAnalytics)), "vega", "voltage_magnitude.json"))
+
+"Vega spec for duals Scatter Plots"
+const default_duals_spec = Vega.loadvgspec(joinpath(dirname(pathof(PowerModelsAnalytics)), "vega", "duals_summary.json"))

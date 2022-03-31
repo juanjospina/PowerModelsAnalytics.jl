@@ -119,19 +119,36 @@ end
 """
 function plot_network(case::Dict{String,<:Any}; positions::Union{Dict{Int,<:Any},InfrastructureGraph}=Dict{Int,Any}(), kwargs...)
 
-    graph = build_network_graph(case; kwargs...)
+    if get(case, "multiinfrastructure", false) == false
+        graph = build_network_graph(case; kwargs...)
+        
+        if isa(positions, InfrastructureGraph)
+            positions = Dict(node => [get_property(positions, node, :x, 0.0), get_property(positions, node, :y, 0.0)] for node in vertices(positions))
+        end
 
-    if isa(positions, InfrastructureGraph)
-        positions = Dict(node => [get_property(positions, node, :x, 0.0), get_property(positions, node, :y, 0.0)] for node in vertices(positions))
+        for (node, (x, y)) in positions
+            set_properties!(graph, node, Dict(:x=>x, :y=>y))
+        end
+
+        graph = plot_network(graph; kwargs...)
+    else
+        tgraph = build_network_graph(case["it"]["pm"]; kwargs...) # create transmission graph
+        dgraph = build_network_graph(case["it"]["pmd"]; kwargs...) # create distribution graph
+        itdgraph = combine_itd_network_graphs(tgraph, dgraph, case) # combine both graphs
+
+        if isa(positions, InfrastructureGraph)
+            positions = Dict(node => [get_property(positions, node, :x, 0.0), get_property(positions, node, :y, 0.0)] for node in vertices(positions))
+        end
+
+        for (node, (x, y)) in positions
+            set_properties!(graph, node, Dict(:x=>x, :y=>y))
+        end
+
+        graph = plot_network(itdgraph; kwargs...)
     end
-
-    for (node, (x, y)) in positions
-        set_properties!(graph, node, Dict(:x=>x, :y=>y))
-    end
-
-    graph = plot_network(graph; kwargs...)
 
     return graph
+
 end
 
 

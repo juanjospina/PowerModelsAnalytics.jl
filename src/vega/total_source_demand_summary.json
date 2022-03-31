@@ -1,50 +1,60 @@
 {
     "$schema": "https://vega.github.io/schema/vega/v5.json",
-    "description": "Time series chart for sources and demands.",
+    "description": "A basic stacked area chart example.",
     "width": 500,
     "height": 300,
     "padding": 5,
 
     "data": [],
 
-    "scales": [
-      {
-          "name": "x",
-          "type": "point",
-          "range": "width",
-          "domain": {"data": "table", "field": "x"}
-      },
-      {
-          "name": "y",
-          "type": "linear",
-          "range": "height",
-          "nice": true,
-          "zero": true,
-          "domain": {"data": "table", "field": "y"}
-      },
-      {
-          "name": "color",
-          "type": "ordinal",
-          "range": "category",
-          "domain": {"data": "table", "field": "c"}
-      },
-      {
-          "name": "legend-labels",
-          "type": "ordinal",
-          "domain": {"data": "table", "field": "c"},
-          "range": []
-        }
+    "scales": [{
+            "name": "x",
+            "type": "point",
+            "range": "width",
+            "domain": {
+                "data": "table",
+                "field": "x"
+            }
+        },
+        {
+            "name": "y",
+            "type": "linear",
+            "range": "height",
+            "nice": true,
+            "zero": true,
+            "domain": {
+                "data": "table",
+                "field": "y1"
+            }
+        },
+        {
+            "name": "color",
+            "type": "ordinal",
+            "range": "category",
+            "domain": {
+                "data": "table",
+                "field": "c"
+            }
+        },
+        {
+            "name": "legend-labels",
+            "type": "ordinal",
+            "domain": {"data": "table", "field": "c"},
+            "range": ["Total Generated", "Total Demand Served", "Total Demand Forecast"]
+          }
     ],
 
     "axes": [{
             "orient": "bottom",
             "scale": "x",
+            "zindex": 1,
             "title": "Step",
             "grid": true
         },
         {
             "orient": "left",
             "scale": "y",
+            "zindex": 1,
             "grid": true
         }
     ],
@@ -59,7 +69,7 @@
         }
       }],
 
-      "marks": [{
+    "marks": [{
         "type": "group",
         "from": {
             "facet": {
@@ -70,7 +80,9 @@
         },
         "marks": [{
             "type": "line",
-            "from": {"data": "series"},
+            "from": {
+                "data": "series"
+            },
             "encode": {
                 "enter": {
                     "x": {
