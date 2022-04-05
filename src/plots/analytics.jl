@@ -397,7 +397,14 @@ function plot_distribution_total_source_demand_summary(fileout::String, mn_solut
     max_digits = maximum([length(n) for (n,_) in mn_solution["nw"]])
 
     power_scale_factor = mn_solution["nw"]["1"]["settings"]["sbase"]
-    units_str = power_scale_factor == 1e2 ? "W" : power_scale_factor == 1e5 ? "kW" : power_scale_factor == 1e10 ? "MW" : "$power_scale_factor W"
+
+    if totals == :real
+        units_str = power_scale_factor == 1e2 ? "W" : power_scale_factor == 1e5 ? "kW" : power_scale_factor == 1e10 ? "MW" : "$power_scale_factor W"
+    elseif totals == :imaginary
+        units_str = power_scale_factor == 1e2 ? "VAR" : power_scale_factor == 1e5 ? "kVAR" : power_scale_factor == 1e10 ? "MVAR" : "$power_scale_factor VAR"
+    else
+        units_str = power_scale_factor == 1e2 ? "VA" : power_scale_factor == 1e5 ? "kVA" : power_scale_factor == 1e10 ? "MVA" : "$power_scale_factor VA"
+    end
 
     spec = deepcopy(default_total_source_demand_summary_spec)
 
@@ -527,7 +534,14 @@ function plot_transmission_total_source_demand_summary(fileout::String, mn_solut
     max_digits = maximum([length(n) for (n,_) in mn_solution["nw"]])
 
     power_scale_factor = mn_solution["nw"]["1"]["baseMVA"]
-    units_str = power_scale_factor == 1e-6 ? "W" : power_scale_factor == 0.001 ? "kW" : power_scale_factor == 100 ? "MW" : "$power_scale_factor W"
+
+    if totals == :real
+        units_str = power_scale_factor == 1e-6 ? "W" : power_scale_factor == 0.001 ? "kW" : power_scale_factor == 100 ? "MW" : "$power_scale_factor W"
+    elseif totals == :imaginary
+        units_str = power_scale_factor == 1e-6 ? "VAR" : power_scale_factor == 0.001 ? "kVAR" : power_scale_factor == 100 ? "MVAR" : "$power_scale_factor VAR"
+    else
+        units_str = power_scale_factor == 1e-6 ? "VA" : power_scale_factor == 0.001 ? "kVA" : power_scale_factor == 100 ? "MVA" : "$power_scale_factor VA"
+    end
 
     spec = deepcopy(default_total_source_demand_summary_spec)
 
@@ -743,10 +757,15 @@ function plot_distribution_source_demand_summary(fileout::String, mn_solution::D
         error("Can't plot active and reactive powers at the same time for this function.")
     end
 
-    max_digits = maximum([length(n) for (n,_) in mn_solution["nw"]])
-
     power_scale_factor = mn_solution["nw"]["1"]["settings"]["sbase"]
-    units_str = power_scale_factor == 1e2 ? "W" : power_scale_factor == 1e5 ? "kW" : power_scale_factor == 1e10 ? "MW" : "$power_scale_factor W"
+
+    if totals == :real
+        units_str = power_scale_factor == 1e2 ? "W" : power_scale_factor == 1e5 ? "kW" : power_scale_factor == 1e10 ? "MW" : "$power_scale_factor W"
+    elseif totals == :imaginary
+        units_str = power_scale_factor == 1e2 ? "VAR" : power_scale_factor == 1e5 ? "kVAR" : power_scale_factor == 1e10 ? "MVAR" : "$power_scale_factor VAR"
+    else
+        units_str = power_scale_factor == 1e2 ? "VA" : power_scale_factor == 1e5 ? "kVA" : power_scale_factor == 1e10 ? "MVA" : "$power_scale_factor VA"
+    end
 
     spec = deepcopy(default_source_demand_summary_spec)
 
@@ -893,10 +912,15 @@ function plot_distribution_source_perphase_summary(fileout::String, mn_solution:
         error("Can't plot active and reactive powers at the same time for this function.")
     end
 
-    max_digits = maximum([length(n) for (n,_) in mn_solution["nw"]])
-
     power_scale_factor = mn_solution["nw"]["1"]["settings"]["sbase"]
-    units_str = power_scale_factor == 1e2 ? "W" : power_scale_factor == 1e5 ? "kW" : power_scale_factor == 1e10 ? "MW" : "$power_scale_factor W"
+
+    if totals == :real
+        units_str = power_scale_factor == 1e2 ? "W" : power_scale_factor == 1e5 ? "kW" : power_scale_factor == 1e10 ? "MW" : "$power_scale_factor W"
+    elseif totals == :imaginary
+        units_str = power_scale_factor == 1e2 ? "VAR" : power_scale_factor == 1e5 ? "kVAR" : power_scale_factor == 1e10 ? "MVAR" : "$power_scale_factor VAR"
+    else
+        units_str = power_scale_factor == 1e2 ? "VA" : power_scale_factor == 1e5 ? "kVA" : power_scale_factor == 1e10 ? "MVA" : "$power_scale_factor VA"
+    end
 
     spec = deepcopy(default_source_demand_summary_spec)
 
@@ -1024,10 +1048,15 @@ function plot_transmission_source_demand_summary(fileout::String, mn_solution::D
         error("Can't plot active and reactive powers at the same time for this funciton.")
     end
 
-    max_digits = maximum([length(n) for (n,_) in mn_solution["nw"]])
-
     power_scale_factor = mn_solution["nw"]["1"]["baseMVA"]
-    units_str = power_scale_factor == 1e-6 ? "W" : power_scale_factor == 0.001 ? "kW" : power_scale_factor == 100 ? "MW" : "$power_scale_factor W"
+
+    if totals == :real
+        units_str = power_scale_factor == 1e-6 ? "W" : power_scale_factor == 0.001 ? "kW" : power_scale_factor == 100 ? "MW" : "$power_scale_factor W"
+    elseif totals == :imaginary
+        units_str = power_scale_factor == 1e-6 ? "VAR" : power_scale_factor == 0.001 ? "kVAR" : power_scale_factor == 100 ? "MVAR" : "$power_scale_factor VAR"
+    else
+        units_str = power_scale_factor == 1e-6 ? "VA" : power_scale_factor == 0.001 ? "kVA" : power_scale_factor == 100 ? "MVA" : "$power_scale_factor VA"
+    end
 
     spec = deepcopy(default_source_demand_summary_spec)
 
@@ -1176,10 +1205,15 @@ function plot_boundary_summary(fileout::String, mn_solution::Dict{String,<:Any};
         error("Can't plot active and reactive powers at the same time for this function.")
     end
 
-    max_digits = maximum([length(n) for (n,_) in mn_solution["nw"]])
-
     power_scale_factor = mn_pmd["nw"]["1"]["settings"]["sbase"]
-    units_str = power_scale_factor == 1e2 ? "W" : power_scale_factor == 1e5 ? "kW" : power_scale_factor == 1e10 ? "MW" : "$power_scale_factor W"
+
+    if totals == :real
+        units_str = power_scale_factor == 1e2 ? "W" : power_scale_factor == 1e5 ? "kW" : power_scale_factor == 1e10 ? "MW" : "$power_scale_factor W"
+    elseif totals == :imaginary
+        units_str = power_scale_factor == 1e2 ? "VAR" : power_scale_factor == 1e5 ? "kVAR" : power_scale_factor == 1e10 ? "MVAR" : "$power_scale_factor VAR"
+    else
+        units_str = power_scale_factor == 1e2 ? "VA" : power_scale_factor == 1e5 ? "kVA" : power_scale_factor == 1e10 ? "MVA" : "$power_scale_factor VA"
+    end
 
     spec = deepcopy(default_source_demand_summary_spec)
 
