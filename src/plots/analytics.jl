@@ -1120,6 +1120,8 @@ function plot_boundary_summary(fileout::String, mn_solution::Dict{String,<:Any};
     totals::Symbol=:real,
     )::Vega.VGSpec
 
+    BOUNDARY_NUMBER = 100000
+
     # Needed just to get the basis of the units
     mn_pmd = mn_solution["it"]["pmd"]
 
@@ -1145,14 +1147,11 @@ function plot_boundary_summary(fileout::String, mn_solution::Dict{String,<:Any};
     end
 
     for (n, nw) in get(mn_solution, "nw", Dict())
-        boundary_counter = 0 # counts the number of boundaries.
         for itd in nw["boundary"]
+            boundary_counter = eval(Meta.parse(itd[1])) # parse tuple from string
+            boundary_counter = boundary_counter[1]-BOUNDARY_NUMBER # get boundary number - BIAS
             # distribution system boundaries
             for boundary in itd[2]
-                # if the problem only has 1 boundary, then assign fix boundary counter
-                if boundaries_number == 1
-                    boundary_counter = 1
-                end
                 if totals == :real
                     if boundary[1]=="pbound_to"
                         for p in phases:-1:1
@@ -1163,9 +1162,6 @@ function plot_boundary_summary(fileout::String, mn_solution::Dict{String,<:Any};
                         end
                     elseif boundary[1]=="pbound_fr"
                         # only add 1 if it is a multi-system problem
-                        if boundaries_number != 1
-                            boundary_counter += 1
-                        end
                         if (parse(Int, n) == 1)
                             boundary_names[(boundaries_number*phases)+boundary_counter] = string(itd[1])
                         end
@@ -1180,10 +1176,7 @@ function plot_boundary_summary(fileout::String, mn_solution::Dict{String,<:Any};
                             reactive_bound[parse(Int, n), (boundary_counter*phases)-p+1] = boundary[2][p]
                         end
                     elseif boundary[1]=="qbound_fr"
-                         # only add 1 if it is a multi-system problem
-                         if boundaries_number != 1
-                            boundary_counter += 1
-                        end
+                        # only add 1 if it is a multi-system problem
                         if (parse(Int, n) == 1)
                             boundary_names[(boundaries_number*phases)+boundary_counter] = string(itd[1])
                         end
