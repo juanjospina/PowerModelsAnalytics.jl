@@ -5,6 +5,10 @@
 - Added option to change the str units in the plots plotting power values. For instance, `:real` -> W, `:imaginary`-> VAR, else -> VA.
 - Fixed bug in `plot_boundary_summary` function that did not allow plotting solutions where `pbound_fr` appeared before `pbound_to.`
 - Refactored way to get `boundary_counter` in function `plot_boundary_summary`.
+- Added two new functions `plot_histogram_distribution_duals` and `plot_histogram_transmission_duals` that plot histograms (count) of duals in the PM, PMD, or PMITD problem.
+- Added two new functions `plot_histogram_distribution_voltage_magnitudes` and `plot_histogram_transmission_voltage_magnitudes` that plot histograms (count) of voltage magnitudes in the PM, PMD, or PMITD problem.
+- Added two new Vega specs that store the formatting of the histogram plots.
+- Updated PowerModelsITD.jl version dependency.
 
 ## v0.5.0
 

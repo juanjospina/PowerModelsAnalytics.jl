@@ -1,0 +1,63 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "description": "Histogram for LMPs.",
+  "width": 500,
+  "height": 300,
+  "padding": 5,
+  "autosize": {"type": "fit", "resize": true},
+
+  "signals": [
+    {
+      "name": "maxbins", "value": 10
+    },
+    {
+      "name": "binCount",
+      "update": "(bins.stop - bins.start) / bins.step"
+    }
+  ],
+
+  "data": [],
+
+  "scales": [
+    {
+      "name": "yscale",
+      "type": "linear",
+      "range": "height",
+      "round": true, "nice": true,
+      "domain": {
+        "fields": [
+          {"data": "counts", "field": "count"}
+        ]
+      }
+    },
+    {
+      "name": "xscale",
+      "type": "linear",
+      "range": [0, {"signal": "width"}],
+      "round": true,
+      "domain": {"signal": "[bins.start, bins.stop]"},
+      "bins": {"signal": "bins"}
+    }
+  ],
+
+  "axes": [
+    {"orient": "bottom", "scale": "xscale", "tickMinStep": 0.5},
+    {"orient": "left", "scale": "yscale", "tickCount": 5, "offset": 5}
+  ],
+
+  "marks": [
+    {
+      "type": "rect",
+      "from": {"data": "counts"},
+      "encode": {
+        "update": {
+          "x": {"scale": "xscale", "field": "bin0", "offset": 1},
+          "x2": {"scale": "xscale", "field": "bin1"},
+          "y": {"scale": "yscale", "field": "count"},
+          "y2": {"scale": "yscale", "value": 0},
+          "fill": {"value": "steelblue"}
+        }
+      }
+    }
+  ]
+}

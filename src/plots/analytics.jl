@@ -1512,6 +1512,429 @@ end
 
 
 """
+    `function plot_histogram_transmission_duals(
+        file::String,
+        mn_solution::Dict{String,<:Any};
+        kwargs...
+    )`
+
+    Plots histogram counting the duals of buses in the transmission system.
+
+    Arguments:
+
+    `fileout::String`: path to file where plot will be saved
+    `mn_solution::Dict{String,<:Any}`: a multinetwork solution from PM or PMITD.
+"""
+function plot_histogram_transmission_duals(fileout::String, mn_solution::Dict{String,<:Any}
+    )::Vega.VGSpec
+
+    # assign correct data based on multiinfrastructure condition
+    if get(mn_solution, "multiinfrastructure", false) != false
+        mn_pm = mn_solution["it"]["pm"]
+    else
+        mn_pm = mn_solution
+    end
+
+
+    # # ---- Transmission plot ----
+    tbus_duals = Vector{Float64}()
+
+    # check if the problem is multinetwork
+    if get(mn_pm, "multinetwork", false) != false
+        # run for all nws
+        for (nw, nw_data) in mn_pm["nw"]
+            for bus in nw_data["bus"]
+                try
+                    push!(tbus_duals, bus[2]["lam_kcl_r"])
+                catch e
+                    continue
+                end
+            end
+        end
+
+    else
+
+        for bus in mn_pm["bus"]
+            try
+                push!(tbus_duals, bus[2]["lam_kcl_r"])
+            catch e
+                continue
+            end
+        end
+
+    end
+
+    # get the spec
+    spec = deepcopy(default_duals_histogram_spec)
+
+    # add to dictionary using specific format
+    trans_duals_data = []
+    for (i,dual) in enumerate(tbus_duals)
+        push!(trans_duals_data, Dict("duals" => dual))
+    end
+
+    @set! spec.data = [
+        Dict(
+            "name" => "table",
+            "values" => trans_duals_data,
+            "transform" => [
+            Dict(
+                "type" => "extent",
+                "field" => "duals",
+                "signal" => "extent"
+            ),
+            Dict(
+                "type" => "bin",
+                "signal" => "bins",
+                "field" => "duals",
+                "extent" => Dict("signal" => "extent"),
+                "maxbins" => Dict("signal" => "maxbins")
+            )
+        ]),
+        Dict(
+            "name" => "counts",
+            "source" => "table",
+            "transform" => [
+            Dict(
+                "type" => "filter",
+                "expr" => "datum['duals'] != null"
+            ),
+            Dict(
+                "type" => "aggregate",
+                "groupby" => ["bin0", "bin1"]
+            )
+        ])
+    ]
+
+    Vega.save(fileout, spec)
+
+    return spec
+
+end
+
+
+"""
+    `function plot_histogram_distribution_duals(
+        file::String,
+        mn_solution::Dict{String,<:Any};
+        kwargs...
+    )`
+
+    Plots histogram counting the duals of buses in the distribution system.
+
+    Arguments:
+
+    `fileout::String`: path to file where plot will be saved
+    `mn_solution::Dict{String,<:Any}`: a multinetwork solution from PM or PMITD.
+"""
+function plot_histogram_distribution_duals(fileout::String, mn_solution::Dict{String,<:Any}
+    )::Vega.VGSpec
+
+    # assign correct data based on multiinfrastructure condition
+    if get(mn_solution, "multiinfrastructure", false) != false
+        mn_pmd = mn_solution["it"]["pmd"]
+    else
+        mn_pmd = mn_solution
+    end
+
+    # # ---- Transmission plot ----
+    dbus_duals = Vector{Float64}()
+
+    # check if the problem is multinetwork
+    if haskey(mn_pmd, "nw")
+        # run for all nws
+        for (nw, nw_data) in mn_pmd["nw"]
+
+            # scale LMPs - TODO: Temporary, since this should happen in PMD and PMITD
+            if get(nw_data, "per_unit", false) != true
+                power_scale_factor = nw_data["settings"]["sbase"]
+            else
+                power_scale_factor = 1
+            end
+
+            for bus in nw_data["bus"]
+                # get the number of phases of the bus
+                phases = length(bus[2]["lam_kcl_r"])
+
+                # loop through phases
+                for phase in 1:1:phases
+                    push!(dbus_duals, bus[2]["lam_kcl_r"][phase]/power_scale_factor)
+                end
+            end
+        end
+    else
+        # scale LMPs - TODO: Temporary, since this should happen in PMD and PMITD
+        if get(mn_pmd, "per_unit", false) != true
+            power_scale_factor = mn_pmd["settings"]["sbase"]
+        else
+            power_scale_factor = 1
+        end
+
+        for bus in mn_pmd["bus"]
+            # get the number of phases of the bus
+            phases = length(bus[2]["lam_kcl_r"])
+
+            # loop through phases
+            for phase in 1:1:phases
+                push!(dbus_duals, bus[2]["lam_kcl_r"][phase]/power_scale_factor)
+            end
+        end
+    end
+
+    # get the spec
+    spec = deepcopy(default_duals_histogram_spec)
+
+    # add to dictionary using specific format
+    dist_duals_data = []
+    for (i,dual) in enumerate(dbus_duals)
+        push!(dist_duals_data, Dict("duals" => dual))
+    end
+
+    @set! spec.data = [
+        Dict(
+            "name" => "table",
+            "values" => dist_duals_data,
+            "transform" => [
+            Dict(
+                "type" => "extent",
+                "field" => "duals",
+                "signal" => "extent"
+            ),
+            Dict(
+                "type" => "bin",
+                "signal" => "bins",
+                "field" => "duals",
+                "extent" => Dict("signal" => "extent"),
+                "maxbins" => Dict("signal" => "maxbins")
+            )
+        ]),
+        Dict(
+            "name" => "counts",
+            "source" => "table",
+            "transform" => [
+            Dict(
+                "type" => "filter",
+                "expr" => "datum['duals'] != null"
+            ),
+            Dict(
+                "type" => "aggregate",
+                "groupby" => ["bin0", "bin1"]
+            )
+        ])
+    ]
+
+    Vega.save(fileout, spec)
+
+    return spec
+
+end
+
+
+"""
+    `function plot_histogram_transmission_voltage_magnitudes(
+        file::String,
+        mn_solution::Dict{String,<:Any};
+        kwargs...
+    )`
+
+    Plots histogram counting the voltage magnitudes of buses in the transmission system.
+
+    Arguments:
+
+    `fileout::String`: path to file where plot will be saved
+    `mn_solution::Dict{String,<:Any}`: a multinetwork solution from PM or PMITD.
+"""
+function plot_histogram_transmission_voltage_magnitudes(fileout::String, mn_solution::Dict{String,<:Any}
+    )::Vega.VGSpec
+
+    # assign correct data based on multiinfrastructure condition
+    if get(mn_solution, "multiinfrastructure", false) != false
+        mn_pm = mn_solution["it"]["pm"]
+    else
+        mn_pm = mn_solution
+    end
+
+
+    # # ---- Transmission plot ----
+    tbus_vmags = Vector{Float64}()
+
+    # check if the problem is multinetwork
+    if get(mn_pm, "multinetwork", false) != false
+        # run for all nws
+        for (nw, nw_data) in mn_pm["nw"]
+            for bus in nw_data["bus"]
+                try
+                    push!(tbus_vmags, bus[2]["vm"])
+                catch e
+                    continue
+                end
+            end
+        end
+
+    else
+
+        for bus in mn_pm["bus"]
+            try
+                push!(tbus_vmags, bus[2]["vm"])
+            catch e
+                continue
+            end
+        end
+
+    end
+
+    # get the spec
+    spec = deepcopy(default_voltage_histogram_spec)
+
+    # add to dictionary using specific format
+    trans_vmags_data = []
+    for (i,vmag) in enumerate(tbus_vmags)
+        push!(trans_vmags_data, Dict("vmags" => vmag))
+    end
+
+    @set! spec.data = [
+        Dict(
+            "name" => "table",
+            "values" => trans_vmags_data,
+            "transform" => [
+            Dict(
+                "type" => "extent",
+                "field" => "vmags",
+                "signal" => "extent"
+            ),
+            Dict(
+                "type" => "bin",
+                "signal" => "bins",
+                "field" => "vmags",
+                "extent" => Dict("signal" => "extent"),
+                "maxbins" => Dict("signal" => "maxbins")
+            )
+        ]),
+        Dict(
+            "name" => "counts",
+            "source" => "table",
+            "transform" => [
+            Dict(
+                "type" => "filter",
+                "expr" => "datum['vmags'] != null"
+            ),
+            Dict(
+                "type" => "aggregate",
+                "groupby" => ["bin0", "bin1"]
+            )
+        ])
+    ]
+
+    Vega.save(fileout, spec)
+
+    return spec
+
+end
+
+
+"""
+    `function plot_histogram_distribution_voltage_magnitudes(
+        file::String,
+        mn_solution::Dict{String,<:Any};
+        kwargs...
+    )`
+
+    Plots histogram counting the voltage magnitudes of buses in the distribution system.
+
+    Arguments:
+
+    `fileout::String`: path to file where plot will be saved
+    `mn_solution::Dict{String,<:Any}`: a multinetwork solution from PM or PMITD.
+"""
+function plot_histogram_distribution_voltage_magnitudes(fileout::String, mn_solution::Dict{String,<:Any}
+    )::Vega.VGSpec
+
+    # assign correct data based on multiinfrastructure condition
+    if get(mn_solution, "multiinfrastructure", false) != false
+        mn_pmd = mn_solution["it"]["pmd"]
+    else
+        mn_pmd = mn_solution
+    end
+
+    # # ---- Transmission plot ----
+    dbus_vmags = Vector{Float64}()
+
+    # check if the problem is multinetwork
+    if haskey(mn_pmd, "nw")
+        # run for all nws
+        for (nw, nw_data) in mn_pmd["nw"]
+            for bus in nw_data["bus"]
+                # get the number of phases of the bus
+                phases = length(bus[2]["vm"])
+
+                # loop through phases
+                for phase in 1:1:phases
+                    push!(dbus_vmags, bus[2]["vm"][phase])
+                end
+            end
+        end
+    else
+        for bus in mn_pmd["bus"]
+            # get the number of phases of the bus
+            phases = length(bus[2]["vm"])
+
+            # loop through phases
+            for phase in 1:1:phases
+                push!(dbus_vmags, bus[2]["vm"][phase])
+            end
+        end
+    end
+
+    # get the spec
+    spec = deepcopy(default_voltage_histogram_spec)
+
+    # add to dictionary using specific format
+    dist_vmags_data = []
+    for (i,vmag) in enumerate(dbus_vmags)
+        push!(dist_vmags_data, Dict("vmags" => vmag))
+    end
+
+    @set! spec.data = [
+        Dict(
+            "name" => "table",
+            "values" => dist_vmags_data,
+            "transform" => [
+            Dict(
+                "type" => "extent",
+                "field" => "vmags",
+                "signal" => "extent"
+            ),
+            Dict(
+                "type" => "bin",
+                "signal" => "bins",
+                "field" => "vmags",
+                "extent" => Dict("signal" => "extent"),
+                "maxbins" => Dict("signal" => "maxbins")
+            )
+        ]),
+        Dict(
+            "name" => "counts",
+            "source" => "table",
+            "transform" => [
+            Dict(
+                "type" => "filter",
+                "expr" => "datum['vmags'] != null"
+            ),
+            Dict(
+                "type" => "aggregate",
+                "groupby" => ["bin0", "bin1"]
+            )
+        ])
+    ]
+
+    Vega.save(fileout, spec)
+
+    return spec
+
+end
+
+
+"""
     `function plot_distribution_duals(
         file::String,
         mn_solution::Dict{String,<:Any};

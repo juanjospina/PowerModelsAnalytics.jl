@@ -21,3 +21,9 @@ const default_voltage_magnitude_spec = Vega.loadvgspec(joinpath(dirname(pathof(P
 
 "Vega spec for duals Scatter Plots"
 const default_duals_spec = Vega.loadvgspec(joinpath(dirname(pathof(PowerModelsAnalytics)), "vega", "duals_summary.json"))
+
+"Vega spec for duals Histogram Plots"
+const default_duals_histogram_spec = Vega.loadvgspec(joinpath(dirname(pathof(PowerModelsAnalytics)), "vega", "duals_histogram.json"))
+
+"Vega spec for voltage Histogram Plots"
+const default_voltage_histogram_spec = Vega.loadvgspec(joinpath(dirname(pathof(PowerModelsAnalytics)), "vega", "voltage_histogram.json"))
