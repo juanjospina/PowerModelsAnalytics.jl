@@ -9,6 +9,7 @@
 - Added two new functions `plot_histogram_distribution_voltage_magnitudes` and `plot_histogram_transmission_voltage_magnitudes` that plot histograms (count) of voltage magnitudes in the PM, PMD, or PMITD problem.
 - Added two new Vega specs that store the formatting of the histogram plots.
 - Updated PowerModelsITD.jl version dependency.
+- Fixed bug in `plot_boundary_summary` that failed to get the correct name of the boundary.
 
 ## v0.5.0
 

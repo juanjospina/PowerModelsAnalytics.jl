@@ -1148,7 +1148,12 @@ function plot_boundary_summary(fileout::String, mn_solution::Dict{String,<:Any};
 
     for (n, nw) in get(mn_solution, "nw", Dict())
         for itd in nw["boundary"]
-            boundary_counter = eval(Meta.parse(itd[1])) # parse tuple from string
+
+            # extract boundary number from string
+            boundary_counter = split(itd[1], ',')
+            boundary_counter = replace(boundary_counter[1], "(" => "" )
+            boundary_counter = parse.(Int64, boundary_counter)
+
             boundary_counter = boundary_counter[1]-BOUNDARY_NUMBER # get boundary number - BIAS
             # distribution system boundaries
             for boundary in itd[2]
@@ -1234,7 +1239,7 @@ function plot_boundary_summary(fileout::String, mn_solution::Dict{String,<:Any};
         )
     ]
 
-    @set! spec.scales[4]["range"] = boundary_names # set legends
+    @set! spec.scales[4]["range"] = boundary_names          # set legends
     @set! spec.axes[2]["title"] = "Power ($units_str)"      # set title
 
     Vega.save(fileout, spec)
