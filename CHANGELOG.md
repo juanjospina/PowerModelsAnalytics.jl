@@ -2,6 +2,8 @@
 
 ## staged
 
+- Update minimum Julia version to v1.6 (LTS)
+- Fix bug in `identify_blocks` for non-default bus status values
 - Added option to change the str units in the plots plotting power values. For instance, `:real` -> W, `:imaginary`-> VAR, else -> VA.
 - Fixed bug in `plot_boundary_summary` function that did not allow plotting solutions where `pbound_fr` appeared before `pbound_to.`
 - Refactored way to get `boundary_counter` in function `plot_boundary_summary`.

@@ -28,7 +28,7 @@ PyCall = "~1.93.1"
 Setfield = "~0.6, 0.7"
 SpecialFunctions = "~2.1.4"
 Vega = "~2.3.0"
-julia = "1.6"
+julia = "~1.6"
 
 [extras]
 PowerModels = "c36e90e8-916a-50a6-bd94-075b64ef4655"
